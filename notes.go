@@ -8,9 +8,9 @@ import (
 )
 
 func showSubject(subject string) {
-  file, err := os.Open("/Users/markmulder/dotfiles/notes/cli.txt")
+  path := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
+  file, err := os.Open(path)
   if err != nil {
-    fmt.Println("error in showSubject")
     fmt.Printf("%v\n", err)
   }
   defer file.Close()
