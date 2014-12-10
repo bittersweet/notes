@@ -24,8 +24,8 @@ func showAllNotes() {
 	}
 }
 
-func showSubject(subject string) {
-	path := fmt.Sprintf("%v%v.txt", getHomeDir(), subject)
+func showNote(note string) {
+	path := fmt.Sprintf("%v%v.txt", getHomeDir(), note)
 	file, err := os.Open(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -36,6 +36,16 @@ func showSubject(subject string) {
 	for scanner.Scan() {
 		fmt.Println(scanner.Text())
 	}
+}
+
+func editNote(note string) {
+	file := fmt.Sprintf("%v%v.txt", getHomeDir(), note)
+
+	command := exec.Command(getEditor(), file)
+	command.Stdin = os.Stdin
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	command.Run()
 }
 
 func getEditor() string {
@@ -51,25 +61,15 @@ func getHomeDir() string {
 	return fmt.Sprintf("%v/dotfiles/notes/", home)
 }
 
-func editNote(subject string) {
-	file := fmt.Sprintf("%v%v.txt", getHomeDir(), subject)
-
-	command := exec.Command(getEditor(), file)
-	command.Stdin = os.Stdin
-	command.Stdout = os.Stdout
-	command.Stderr = os.Stderr
-	command.Run()
-}
-
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
 	app.Version = "0.1.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
-		subject := c.Args().First()
-		if len(subject) > 0 {
-			showSubject(subject)
+		note := c.Args().First()
+		if len(note) > 0 {
+			showNote(note)
 		} else {
 			showAllNotes()
 		}
