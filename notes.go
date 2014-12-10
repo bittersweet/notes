@@ -2,37 +2,12 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
-
-var (
-	ListPtr bool
-)
-
-func showSubject(subject string) {
-	path := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
-	file, err := os.Open(path)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-	}
-}
-
-func setOptions() {
-	flag.BoolVar(&ListPtr, "list", false, "list all known notes")
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s subject [options]\n", os.Args[0])
-		flag.PrintDefaults()
-	}
-}
 
 func showAllNotes() {
 	matches, err := filepath.Glob("/Users/markmulder/dotfiles/notes/*.txt")
@@ -48,16 +23,61 @@ func showAllNotes() {
 	}
 }
 
-func main() {
-	setOptions()
-	flag.Parse()
-
-	subject := flag.Arg(0)
-
-	if ListPtr || len(subject) == 0 {
-		showAllNotes()
-		os.Exit(0)
+func showSubject(subject string) {
+	path := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Printf("%v\n", err)
 	}
+	defer file.Close()
 
-	showSubject(subject)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+}
+
+func editNote(subject string) {
+	file := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
+
+	editor := "vi"
+	command := exec.Command(editor, file)
+	command.Stdin = os.Stdin
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stderr
+	command.Run()
+}
+
+func main() {
+	app := cli.NewApp()
+	app.Name = "notes"
+	app.Usage = "Store your thoughts on all sorts of subjects"
+	app.Action = func(c *cli.Context) {
+		subject := c.Args().First()
+		if len(subject) > 0 {
+			showSubject(subject)
+		} else {
+			showAllNotes()
+		}
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:      "list",
+			ShortName: "l",
+			Usage:     "List all notes",
+			Action: func(c *cli.Context) {
+				showAllNotes()
+			},
+		},
+		{
+			Name:      "edit",
+			ShortName: "e",
+			Usage:     "Edit a note",
+			Action: func(c *cli.Context) {
+				editNote(c.Args().First())
+			},
+		},
+	}
+	app.Run(os.Args)
+
 }
