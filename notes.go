@@ -5,6 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+)
+
+var (
+	ListPtr bool
 )
 
 func showSubject(subject string) {
@@ -21,12 +26,38 @@ func showSubject(subject string) {
 	}
 }
 
-func main() {
-	flag.Parse()
-	subject := flag.Arg(0)
-	if len(subject) == 0 {
-		fmt.Printf("No subject given, exiting\n")
-	} else {
-		showSubject(subject)
+func setOptions() {
+	flag.BoolVar(&ListPtr, "list", false, "list all known notes")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s subject [options]\n", os.Args[0])
+		flag.PrintDefaults()
 	}
+}
+
+func showAllNotes() {
+	matches, err := filepath.Glob("/Users/markmulder/dotfiles/notes/*.txt")
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
+
+	for i := 0; i < len(matches); i++ {
+		match := matches[i]
+		filename := filepath.Base(match)
+		base_size := len(filename) - 4
+		fmt.Println(filename[:base_size])
+	}
+}
+
+func main() {
+	setOptions()
+	flag.Parse()
+
+	subject := flag.Arg(0)
+
+	if ListPtr || len(subject) == 0 {
+		showAllNotes()
+		os.Exit(0)
+	}
+
+	showSubject(subject)
 }
