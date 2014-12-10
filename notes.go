@@ -10,7 +10,8 @@ import (
 )
 
 func showAllNotes() {
-	matches, err := filepath.Glob("/Users/markmulder/dotfiles/notes/*.txt")
+	path := fmt.Sprintf("%v*.txt", getHomeDir())
+	matches, err := filepath.Glob(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -24,7 +25,7 @@ func showAllNotes() {
 }
 
 func showSubject(subject string) {
-	path := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
+	path := fmt.Sprintf("%v%v.txt", getHomeDir(), subject)
 	file, err := os.Open(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -45,8 +46,13 @@ func getEditor() string {
 	return editor
 }
 
+func getHomeDir() string {
+	home := os.Getenv("HOME")
+	return fmt.Sprintf("%v/dotfiles/notes/", home)
+}
+
 func editNote(subject string) {
-	file := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
+	file := fmt.Sprintf("%v%v.txt", getHomeDir(), subject)
 
 	command := exec.Command(getEditor(), file)
 	command.Stdin = os.Stdin
@@ -58,6 +64,7 @@ func editNote(subject string) {
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
+	app.Version = "0.1.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
 		subject := c.Args().First()
