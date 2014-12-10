@@ -37,11 +37,18 @@ func showSubject(subject string) {
 	}
 }
 
+func getEditor() string {
+	editor := os.Getenv("EDITOR")
+	if len(editor) == 0 {
+		editor = "vi"
+	}
+	return editor
+}
+
 func editNote(subject string) {
 	file := fmt.Sprintf("/Users/markmulder/dotfiles/notes/%v.txt", subject)
 
-	editor := "vi"
-	command := exec.Command(editor, file)
+	command := exec.Command(getEditor(), file)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
