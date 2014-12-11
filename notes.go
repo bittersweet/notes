@@ -38,7 +38,7 @@ func showNote(note string) {
 	}
 }
 
-func editNote(note string) {
+func editOrCreateNote(note string) {
 	file := fmt.Sprintf("%v%v.txt", getHomeDir(), note)
 
 	command := exec.Command(getEditor(), file)
@@ -64,7 +64,7 @@ func getHomeDir() string {
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
-	app.Version = "0.1.0"
+	app.Version = "0.2.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()
@@ -84,11 +84,19 @@ func main() {
 			},
 		},
 		{
+			Name:      "new",
+			ShortName: "n",
+			Usage:     "Create new note",
+			Action: func(c *cli.Context) {
+				editOrCreateNote(c.Args().First())
+			},
+		},
+		{
 			Name:      "edit",
 			ShortName: "e",
 			Usage:     "Edit a note",
 			Action: func(c *cli.Context) {
-				editNote(c.Args().First())
+				editOrCreateNote(c.Args().First())
 			},
 		},
 	}
