@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.3.0
+
+- Colorize commented lines.
+
 ## 0.2.0
 
 - Add creating new notes.

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 )
 
 func showAllNotes() {
@@ -34,8 +35,22 @@ func showNote(note string) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		line := scanner.Text()
+
+		commentRegexp, _ := regexp.Compile("^#")
+		if commentRegexp.MatchString(line) == true {
+			colorizeComment(line)
+		} else {
+			fmt.Println(line)
+		}
 	}
+}
+
+func colorizeComment(line string) {
+	highlight := "\033[33m"
+	reset := "\033[0m"
+
+	fmt.Printf("%v%v%v\n", highlight, line, reset)
 }
 
 func editOrCreateNote(note string) {
@@ -64,7 +79,7 @@ func getHomeDir() string {
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
-	app.Version = "0.2.0"
+	app.Version = "0.3.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()
