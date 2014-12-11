@@ -15,6 +15,8 @@ outputted, an example:
 lsof -p $PID
 ```
 
+![](http://img.springe.st/1._tmux_2014-12-11_11-23-42.png)
+
 ## Installation
 
 As it's in super early stage, you'll have to build it yourself. I'm hoping you
