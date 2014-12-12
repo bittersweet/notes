@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.4.0
+
+- Opens editor with note name anyway if it doesn't exist yet.
+
 ## 0.3.0
 
 - Colorize commented lines.
