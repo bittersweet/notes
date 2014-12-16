@@ -1,16 +1,15 @@
 package main
 
 import (
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
 
 func TestGetEditorDefault(t *testing.T) {
-	outcome := "vi"
-	result := getEditor()
-	if result != outcome {
-		t.Fatalf("Failed, got %v, expected %v", result, outcome)
-	}
+	expected := "vi"
+	outcome := getEditor()
+	assert.Equal(t, expected, outcome)
 }
 
 func TestGetEditorWithEnvVariable(t *testing.T) {
@@ -18,11 +17,9 @@ func TestGetEditorWithEnvVariable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Setenv failed")
 	}
-	outcome := "nano"
-	result := getEditor()
-	if result != outcome {
-		t.Fatalf("Failed, got %v, expected %v", result, outcome)
-	}
+	expected := "nano"
+	outcome := getEditor()
+	assert.Equal(t, expected, outcome)
 }
 
 func TestGetHomeDir(t *testing.T) {
@@ -30,9 +27,7 @@ func TestGetHomeDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Setenv failed")
 	}
-	outcome := "/home/testuser/dotfiles/notes/"
-	result := getHomeDir()
-	if result != outcome {
-		t.Fatalf("Failed, got %v, expected %v", result, outcome)
-	}
+	expected := "/home/testuser/dotfiles/notes/"
+	outcome := getHomeDir()
+	assert.Equal(t, expected, outcome)
 }
