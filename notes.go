@@ -73,8 +73,12 @@ func getEditor() string {
 }
 
 func getHomeDir() string {
-	home := os.Getenv("HOME")
-	return fmt.Sprintf("%v/dotfiles/notes/", home)
+	notesdir := os.Getenv("NOTESDIR")
+	if notesdir != "" {
+		return notesdir
+	} else {
+		return fmt.Sprintf("%v/dotfiles/notes/", os.Getenv("HOME"))
+	}
 }
 
 func main() {
@@ -117,5 +121,4 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
-
 }

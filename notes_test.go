@@ -31,3 +31,13 @@ func TestGetHomeDir(t *testing.T) {
 	outcome := getHomeDir()
 	assert.Equal(t, expected, outcome)
 }
+
+func TestGetHomeDirWithEnvVariable(t *testing.T) {
+	err := os.Setenv("NOTESDIR", "/some/other/path/")
+	if err != nil {
+		t.Fatalf("Setenv failed")
+	}
+	expected := "/some/other/path/"
+	outcome := getHomeDir()
+	assert.Equal(t, expected, outcome)
+}
