@@ -1,0 +1,7 @@
+language: go
+
+script: go test ./...
+
+install:
+  - go get -d -v github.com/codegangsta/cli
+  - go get -d -v github.com/stretchr/testify/assert

@@ -1,5 +1,7 @@
 # notes
 
+[![Build Status](https://travis-ci.org/bittersweet/notes.svg)](https://travis-ci.org/bittersweet/notes)
+
 Store your thoughts on all sorts of subjects and easily read them on the
 commandline. I use it for CLI commands I don't use very often and keep
 forgetting.
