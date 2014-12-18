@@ -4,7 +4,8 @@ Store your thoughts on all sorts of subjects and easily read them on the
 commandline. I use it for CLI commands I don't use very often and keep
 forgetting.
 
-Currently it expects a `~/dotfiles/notes/` directory to store all the notes.
+Currently it expects a `~/dotfiles/notes/` directory to store all the notes
+but you can override this by setting the `$NOTESDIR` variable.
 These are just simple textfiles for easy editting and portability.
 
 You can use # comments to explain the command, these will get colorized when
@@ -33,3 +34,7 @@ a desired location.
 
 Editting and creating new notes uses $EDITOR or vi if that is not set.
 
+
+## Testing
+
+To run the tests simply use the `go test` command.
