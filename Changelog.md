@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.5.0
+
+- Allow overriding of storage directory via `NOTESDIR`, thanks to @mongrelion.
+
 ## 0.4.0
 
 - Opens editor with note name anyway if it doesn't exist yet.

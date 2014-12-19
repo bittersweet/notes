@@ -4,12 +4,13 @@ Store your thoughts on all sorts of subjects and easily read them on the
 commandline. I use it for CLI commands I don't use very often and keep
 forgetting.
 
-Currently it expects a `~/dotfiles/notes/` directory to store all the notes
-but you can override this by setting the `$NOTESDIR` variable.
-These are just simple textfiles for easy editting and portability.
+It expects a `~/dotfiles/notes/` directory to store all the notes but you can
+override this by setting the `$NOTESDIR` variable from within your `.profile`
+for example.
+The notes are stored as simple textfiles for easy editting and portability.
 
-You can use # comments to explain the command, these will get colorized when
-outputted, an example:
+You can prepend a line with `#` to explain the command, these comments will get
+colorized, an example:
 
 ```
 # Show open files by PID
@@ -20,10 +21,9 @@ lsof -p $PID
 
 ## Installation
 
-As it's in super early stage, you'll have to build it yourself. I'm hoping you
-have Go already setup. If so, just clone, `go get`, and run `make` to build it
-and move it to `/usr/local/bin/`, or `go build notes.go` and move it yourself to
-a desired location.
+You can download the [latest
+release](https://github.com/bittersweet/notes/releases) or build it yourself of
+course.
 
 ## Usage
 
@@ -32,8 +32,7 @@ a desired location.
 `notes edit [note]` edits
 `notes new [name]` creates a new note
 
-Editting and creating new notes uses $EDITOR or vi if that is not set.
-
+Editting and creating new notes uses `$EDITOR` or `vi` in case that is not set.
 
 ## Testing
 
