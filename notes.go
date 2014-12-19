@@ -11,7 +11,7 @@ import (
 )
 
 func showAllNotes() {
-	path := fmt.Sprintf("%v*.txt", getHomeDir())
+	path := fmt.Sprintf("%v*.txt", getNotesDir())
 	matches, err := filepath.Glob(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -26,7 +26,7 @@ func showAllNotes() {
 }
 
 func showNote(note string) {
-	path := fmt.Sprintf("%v%v.txt", getHomeDir(), note)
+	path := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
 	file, err := os.Open(path)
 	if err != nil {
 		// File does not exist, creating it
@@ -55,7 +55,7 @@ func colorizeComment(line string) {
 }
 
 func editOrCreateNote(note string) {
-	file := fmt.Sprintf("%v%v.txt", getHomeDir(), note)
+	file := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
 
 	command := exec.Command(getEditor(), file)
 	command.Stdin = os.Stdin
@@ -72,12 +72,13 @@ func getEditor() string {
 	return editor
 }
 
-func getHomeDir() string {
+func getNotesDir() string {
+	homedir := os.Getenv("HOME")
 	notesdir := os.Getenv("NOTESDIR")
 	if notesdir != "" {
 		return notesdir
 	} else {
-		return fmt.Sprintf("%v/dotfiles/notes/", os.Getenv("HOME"))
+		return fmt.Sprintf("%v/dotfiles/notes/", homedir)
 	}
 }
 

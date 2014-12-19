@@ -22,22 +22,36 @@ func TestGetEditorWithEnvVariable(t *testing.T) {
 	assert.Equal(t, expected, outcome)
 }
 
-func TestGetHomeDir(t *testing.T) {
+func TestGetNotesDir(t *testing.T) {
 	err := os.Setenv("HOME", "/home/testuser")
 	if err != nil {
 		t.Fatalf("Setenv failed")
 	}
 	expected := "/home/testuser/dotfiles/notes/"
-	outcome := getHomeDir()
+	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
 }
 
-func TestGetHomeDirWithEnvVariable(t *testing.T) {
+func TestGetNotesDirWithCustomEnvVariable(t *testing.T) {
 	err := os.Setenv("NOTESDIR", "/some/other/path/")
 	if err != nil {
 		t.Fatalf("Setenv failed")
 	}
 	expected := "/some/other/path/"
-	outcome := getHomeDir()
+	outcome := getNotesDir()
+	assert.Equal(t, expected, outcome)
+}
+
+func TestGetNotesDirUsesCustomEnvVariableOverHomeEnvVariable(t *testing.T) {
+	err := os.Setenv("HOME", "/home/testuser")
+	if err != nil {
+		t.Fatalf("Setenv failed")
+	}
+	err = os.Setenv("NOTESDIR", "/some/other/path/")
+	if err != nil {
+		t.Fatalf("Setenv failed")
+	}
+	expected := "/some/other/path/"
+	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
 }
