@@ -55,3 +55,45 @@ func TestGetNotesDirUsesCustomEnvVariableOverHomeEnvVariable(t *testing.T) {
 	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
 }
+
+func TestFindNotes(t *testing.T) {
+	var notes []Note
+	notes = append(notes, Note{
+		Explanation: []string{"# Explanation first"},
+		Command:     []string{"./notes first"},
+	})
+	notes = append(notes, Note{
+		Explanation: []string{"# Explanation second"},
+		Command:     []string{"./notes second"},
+	})
+	result := FindNotes(notes, "second")
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, result[0].Command, []string{"./notes second"})
+}
+
+func TestFindNotesSearchesCommandsAsWell(t *testing.T) {
+	var notes []Note
+	notes = append(notes, Note{
+		Explanation: []string{"# Explanation first"},
+		Command:     []string{"./notes first"},
+	})
+	notes = append(notes, Note{
+		Explanation: []string{"# Explanation second"},
+		Command:     []string{"./notes match"},
+	})
+	result := FindNotes(notes, "match")
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, result[0].Command, []string{"./notes match"})
+}
+
+func TestFindNotesCaseInsensitivity(t *testing.T) {
+	var notes []Note
+
+	note := Note{
+		Explanation: []string{"# Explanation note MATCH"},
+		Command:     []string{"Run rm -rf", "echo 'done'"},
+	}
+	notes = append(notes, note)
+	result := FindNotes(notes, "match")
+	assert.Equal(t, 1, len(result))
+}

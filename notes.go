@@ -10,6 +10,48 @@ import (
 	"regexp"
 )
 
+type Note struct {
+	Explanation []string
+	Command     []string
+}
+
+func (n *Note) Print() {
+	for _, line := range n.Explanation {
+		colorizeComment(line)
+	}
+
+	for _, line := range n.Command {
+		fmt.Println(line)
+	}
+	fmt.Println()
+}
+
+func FindNotes(notes []Note, query string) []Note {
+	var results []Note
+
+Loop:
+	for _, note := range notes {
+		queryRegexp := fmt.Sprintf("(?i)%s", query)
+		searchRegexp, _ := regexp.Compile(queryRegexp)
+
+		for _, line := range note.Explanation {
+			if searchRegexp.MatchString(line) == true {
+				results = append(results, note)
+				continue Loop
+			}
+		}
+
+		for _, line := range note.Command {
+			if searchRegexp.MatchString(line) == true {
+				results = append(results, note)
+				continue Loop
+			}
+		}
+	}
+
+	return results
+}
+
 func showAllNotes() {
 	path := fmt.Sprintf("%v*.txt", getNotesDir())
 	matches, err := filepath.Glob(path)
@@ -20,12 +62,18 @@ func showAllNotes() {
 	for i := 0; i < len(matches); i++ {
 		match := matches[i]
 		filename := filepath.Base(match)
-		base_size := len(filename) - 4
+		base_size := len(filename) - 4 // Note filename without .txt
 		fmt.Println(filename[:base_size])
 	}
 }
 
-func showNote(note string) {
+func showNote(params ...string) {
+	note := params[0]
+	var query string
+	if len(params) > 1 {
+		query = params[1]
+	}
+
 	path := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
 	file, err := os.Open(path)
 	if err != nil {
@@ -34,16 +82,36 @@ func showNote(note string) {
 	}
 	defer file.Close()
 
+	var notes []Note
+	var n Note
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		commentRegexp, _ := regexp.Compile("^#")
 		if commentRegexp.MatchString(line) == true {
-			colorizeComment(line)
+			n.Explanation = append(n.Explanation, line)
+		} else if line == "" {
+			// newline means the start of a new note so we add the last found note
+			// and set n to a new note to restart the process
+			notes = append(notes, n)
+			n = Note{} // Reset note
 		} else {
-			fmt.Println(line)
+			n.Command = append(n.Command, line)
 		}
+	}
+	if len(n.Explanation) > 0 {
+		// Do not append an empty note if a newline was the last line of a file
+		notes = append(notes, n)
+	}
+
+	if len(params) > 1 {
+		notes = FindNotes(notes, query)
+	}
+
+	for i := 0; i < len(notes); i++ {
+		notes[i].Print()
 	}
 }
 
@@ -89,10 +157,12 @@ func main() {
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()
-		if len(note) > 0 {
+		if len(c.Args()) == 0 {
+			showAllNotes()
+		} else if len(c.Args()) == 1 {
 			showNote(note)
 		} else {
-			showAllNotes()
+			showNote(note, c.Args()[1])
 		}
 	}
 	app.Commands = []cli.Command{
