@@ -1,5 +1,10 @@
 # Notes Changelog
 
+## 0.6.0
+
+- Added searching in notes via `notes subject query` to only display matched
+notes, searches on the explanation and command.
+
 ## 0.5.0
 
 - Allow overriding of storage directory via `NOTESDIR`, thanks to @mongrelion.
