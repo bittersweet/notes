@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+
+	"github.com/codegangsta/cli"
 )
 
 type Note struct {
