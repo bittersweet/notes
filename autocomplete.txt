@@ -1,0 +1,1 @@
+http://fgrehm.viewdocs.io/devstep/cli/installation this script does it by curling something and installing

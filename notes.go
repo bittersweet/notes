@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+
+	"github.com/codegangsta/cli"
 )
 
 type Note struct {
@@ -52,18 +53,27 @@ Loop:
 	return results
 }
 
-func showAllNotes() {
+func getAllNotes() []string {
 	path := fmt.Sprintf("%v*.txt", getNotesDir())
-	matches, err := filepath.Glob(path)
+	files, err := filepath.Glob(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
+	for i := 0; i < len(files); i++ {
+		file := files[i]
+		filename := filepath.Base(file)
+		base_size := len(filename) - 4 // Note filename without .txt
+		files[i] = filename[:base_size]
+	}
 
+	return files
+}
+
+func showAllNotes() {
+	matches := getAllNotes()
 	for i := 0; i < len(matches); i++ {
 		match := matches[i]
-		filename := filepath.Base(match)
-		base_size := len(filename) - 4 // Note filename without .txt
-		fmt.Println(filename[:base_size])
+		fmt.Println(match)
 	}
 }
 
@@ -152,9 +162,27 @@ func getNotesDir() string {
 
 func main() {
 	app := cli.NewApp()
+	app.EnableBashCompletion = true
 	app.Name = "notes"
 	app.Version = "0.5.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
+	app.BashComplete = func(c *cli.Context) {
+		fmt.Println("main bashcomplete")
+		if len(c.Args()) > 0 {
+			return
+		}
+
+		// Add all app commands to autocomplete
+		for _, command := range app.Commands {
+			fmt.Println(command.Name)
+		}
+
+		// Add all filenames to autocomplete
+		files := getAllNotes()
+		for _, file := range files {
+			fmt.Println(file)
+		}
+	}
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()
 		if len(c.Args()) == 0 {
@@ -173,6 +201,15 @@ func main() {
 			Action: func(c *cli.Context) {
 				showAllNotes()
 			},
+			BashComplete: func(c *cli.Context) {
+				if len(c.Args()) > 0 {
+					return
+				}
+				files := getAllNotes()
+				for _, file := range files {
+					fmt.Println(file)
+				}
+			},
 		},
 		{
 			Name:      "new",
@@ -188,6 +225,15 @@ func main() {
 			Usage:     "Edit a note",
 			Action: func(c *cli.Context) {
 				editOrCreateNote(c.Args().First())
+			},
+			BashComplete: func(c *cli.Context) {
+				if len(c.Args()) > 0 {
+					return
+				}
+				files := getAllNotes()
+				for _, file := range files {
+					fmt.Println(file)
+				}
 			},
 		},
 	}
