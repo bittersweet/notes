@@ -67,7 +67,7 @@ func TestFindNotes(t *testing.T) {
 		Explanation: []string{"# Explanation second"},
 		Command:     []string{"./notes second"},
 	})
-	result := FindNotes(notes, "second")
+	result := findNotes(notes, "second")
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, result[0].Command, []string{"./notes second"})
 }
@@ -82,7 +82,7 @@ func TestFindNotesSearchesCommandsAsWell(t *testing.T) {
 		Explanation: []string{"# Explanation second"},
 		Command:     []string{"./notes match"},
 	})
-	result := FindNotes(notes, "match")
+	result := findNotes(notes, "match")
 	assert.Equal(t, 1, len(result))
 	assert.Equal(t, result[0].Command, []string{"./notes match"})
 }
@@ -95,6 +95,6 @@ func TestFindNotesCaseInsensitivity(t *testing.T) {
 		Command:     []string{"Run rm -rf", "echo 'done'"},
 	}
 	notes = append(notes, note)
-	result := FindNotes(notes, "match")
+	result := findNotes(notes, "match")
 	assert.Equal(t, 1, len(result))
 }

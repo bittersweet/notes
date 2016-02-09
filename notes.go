@@ -11,11 +11,13 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+// Note holds parsed explanation and commands
 type Note struct {
 	Explanation []string
 	Command     []string
 }
 
+// Print outputs an indivial note comment and command to STDOUT
 func (n *Note) Print() {
 	for _, line := range n.Explanation {
 		colorizeComment(line)
@@ -27,7 +29,7 @@ func (n *Note) Print() {
 	fmt.Println()
 }
 
-func FindNotes(notes []Note, query string) []Note {
+func findNotes(notes []Note, query string) []Note {
 	var results []Note
 
 Loop:
@@ -38,6 +40,7 @@ Loop:
 		for _, line := range note.Explanation {
 			if searchRegexp.MatchString(line) == true {
 				results = append(results, note)
+				// We already have a match, continue with the next note
 				continue Loop
 			}
 		}
@@ -45,7 +48,6 @@ Loop:
 		for _, line := range note.Command {
 			if searchRegexp.MatchString(line) == true {
 				results = append(results, note)
-				continue Loop
 			}
 		}
 	}
@@ -63,8 +65,8 @@ func showAllNotes() {
 	for i := 0; i < len(matches); i++ {
 		match := matches[i]
 		filename := filepath.Base(match)
-		base_size := len(filename) - 4 // Note filename without .txt
-		fmt.Println(filename[:base_size])
+		baseSize := len(filename) - 4 // Strip .txt from note filenames
+		fmt.Println(filename[:baseSize])
 	}
 }
 
@@ -108,7 +110,7 @@ func showNote(params ...string) {
 	}
 
 	if len(params) > 1 {
-		notes = FindNotes(notes, query)
+		notes = findNotes(notes, query)
 	}
 
 	for i := 0; i < len(notes); i++ {
@@ -146,9 +148,8 @@ func getNotesDir() string {
 	notesdir := os.Getenv("NOTESDIR")
 	if notesdir != "" {
 		return notesdir
-	} else {
-		return fmt.Sprintf("%v/dotfiles/notes/", homedir)
 	}
+	return fmt.Sprintf("%v/dotfiles/notes/", homedir)
 }
 
 func main() {
