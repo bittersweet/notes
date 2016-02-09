@@ -80,8 +80,9 @@ func showNote(params ...string) {
 	path := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
 	file, err := os.Open(path)
 	if err != nil {
-		// File does not exist, creating it
+		// File does not exist, create it
 		editOrCreateNote(note)
+		return
 	}
 	defer file.Close()
 
