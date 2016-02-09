@@ -73,6 +73,8 @@ func showAllNotes() {
 func showNote(params ...string) {
 	note := params[0]
 	var query string
+	// params will be > 1 if a search term has been entered:
+	// $ notes <note> <query>
 	if len(params) > 1 {
 		query = params[1]
 	}
@@ -145,11 +147,13 @@ func getEditor() string {
 }
 
 func getNotesDir() string {
-	homedir := os.Getenv("HOME")
 	notesdir := os.Getenv("NOTESDIR")
 	if notesdir != "" {
 		return notesdir
 	}
+
+	// Use default location, ~/dotfiles/notes/
+	homedir := os.Getenv("HOME")
 	return fmt.Sprintf("%v/dotfiles/notes/", homedir)
 }
 
@@ -161,10 +165,13 @@ func main() {
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()
 		if len(c.Args()) == 0 {
+			// $ notes
 			showAllNotes()
 		} else if len(c.Args()) == 1 {
+			// $ notes <note>
 			showNote(note)
 		} else {
+			// $ notes <note> <query>
 			showNote(note, c.Args()[1])
 		}
 	}
@@ -174,6 +181,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "List all notes",
 			Action: func(c *cli.Context) {
+				// $ notes list
 				showAllNotes()
 			},
 		},
@@ -182,6 +190,7 @@ func main() {
 			ShortName: "n",
 			Usage:     "Create new note",
 			Action: func(c *cli.Context) {
+				// $ notes new <note>
 				editOrCreateNote(c.Args().First())
 			},
 		},
@@ -190,6 +199,8 @@ func main() {
 			ShortName: "e",
 			Usage:     "Edit a note",
 			Action: func(c *cli.Context) {
+				// $ notes edit <note>
+				// $ notes e <note>
 				editOrCreateNote(c.Args().First())
 			},
 		},
