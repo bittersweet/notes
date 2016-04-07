@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.6.1
+
+- Fixed using a custom `NOTESDIR` not working without a trailing slash.
+
 ## 0.6.0
 
 - Added searching in notes via `notes subject query` to only display matched
