@@ -170,7 +170,7 @@ func getNote(path string) string {
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
-	app.Version = "0.6.1"
+	app.Version = "0.6.2"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.Action = func(c *cli.Context) {
 		note := c.Args().First()

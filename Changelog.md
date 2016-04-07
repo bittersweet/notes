@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.6.2
+
+- Fixed opening notes that broke in 0.6.1 because of the removal of the trailing slash :-).
+
 ## 0.6.1
 
 - Fixed using a custom `NOTESDIR` not working without a trailing slash.
