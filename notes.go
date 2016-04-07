@@ -56,7 +56,7 @@ Loop:
 }
 
 func showAllNotes() {
-	path := fmt.Sprintf("%v*.txt", getNotesDir())
+	path := fmt.Sprintf("%v/*.txt", getNotesDir())
 	matches, err := filepath.Glob(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -146,15 +146,20 @@ func getEditor() string {
 	return editor
 }
 
+// getNotesDir returns the path to the configured notes
+// dir, without a trailing slash
 func getNotesDir() string {
 	notesdir := os.Getenv("NOTESDIR")
+	var dir string
 	if notesdir != "" {
-		return notesdir
+		dir = notesdir
+	} else {
+		// Use default location, ~/dotfiles/notes/
+		homedir := os.Getenv("HOME")
+		dir = fmt.Sprintf("%v/dotfiles/notes/", homedir)
 	}
 
-	// Use default location, ~/dotfiles/notes/
-	homedir := os.Getenv("HOME")
-	return fmt.Sprintf("%v/dotfiles/notes/", homedir)
+	return filepath.Clean(dir)
 }
 
 func main() {
