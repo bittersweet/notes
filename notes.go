@@ -79,7 +79,7 @@ func showNote(params ...string) {
 		query = params[1]
 	}
 
-	path := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
+	path := getNote(note)
 	file, err := os.Open(path)
 	if err != nil {
 		// File does not exist, create it
@@ -129,9 +129,9 @@ func colorizeComment(line string) {
 }
 
 func editOrCreateNote(note string) {
-	file := fmt.Sprintf("%v%v.txt", getNotesDir(), note)
+	path := getNote(note)
 
-	command := exec.Command(getEditor(), file)
+	command := exec.Command(getEditor(), path)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
@@ -160,6 +160,11 @@ func getNotesDir() string {
 	}
 
 	return filepath.Clean(dir)
+}
+
+// getNote returns the path to the note given
+func getNote(path string) string {
+	return fmt.Sprintf("%s/%s.txt", getNotesDir(), path)
 }
 
 func main() {

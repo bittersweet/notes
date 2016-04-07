@@ -1,11 +1,19 @@
 package main
 
 import (
+	"log"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	err := os.Setenv("HOME", "/home/testuser")
+	if err != nil {
+		log.Fatalf("Setenv failed")
+	}
+}
 
 func TestGetEditorDefault(t *testing.T) {
 	expected := "vi"
@@ -24,10 +32,6 @@ func TestGetEditorWithEnvVariable(t *testing.T) {
 }
 
 func TestGetNotesDir(t *testing.T) {
-	err := os.Setenv("HOME", "/home/testuser")
-	if err != nil {
-		t.Fatalf("Setenv failed")
-	}
 	expected := "/home/testuser/dotfiles/notes"
 	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
@@ -41,6 +45,8 @@ func TestGetNotesDirWithCustomEnvVariable(t *testing.T) {
 	expected := "/some/other/path"
 	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
+
+	_ = os.Unsetenv("NOTESDIR")
 }
 
 func TestGetNotesDirUsesCustomEnvVariableOverHomeEnvVariable(t *testing.T) {
@@ -55,6 +61,8 @@ func TestGetNotesDirUsesCustomEnvVariableOverHomeEnvVariable(t *testing.T) {
 	expected := "/some/other/path"
 	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
+
+	_ = os.Unsetenv("NOTESDIR")
 }
 
 func TestGetNotesDirUsesCustomEnvVariableWithoutTrailingSlash(t *testing.T) {
@@ -65,6 +73,8 @@ func TestGetNotesDirUsesCustomEnvVariableWithoutTrailingSlash(t *testing.T) {
 	expected := "/some/other/path"
 	outcome := getNotesDir()
 	assert.Equal(t, expected, outcome)
+
+	_ = os.Unsetenv("NOTESDIR")
 }
 
 func TestFindNotes(t *testing.T) {
@@ -107,4 +117,10 @@ func TestFindNotesCaseInsensitivity(t *testing.T) {
 	notes = append(notes, note)
 	result := findNotes(notes, "match")
 	assert.Equal(t, 1, len(result))
+}
+
+func TestGetNote(t *testing.T) {
+	expected := "/home/testuser/dotfiles/notes/git.txt"
+	outcome := getNote("git")
+	assert.Equal(t, expected, outcome)
 }
