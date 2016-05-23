@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 // Note holds parsed explanation and commands
@@ -55,7 +55,7 @@ Loop:
 	return results
 }
 
-func showAllNotes() {
+func getAllNotes() []string {
 	path := fmt.Sprintf("%v/*.txt", getNotesDir())
 	matches, err := filepath.Glob(path)
 	if err != nil {
@@ -66,7 +66,17 @@ func showAllNotes() {
 		match := matches[i]
 		filename := filepath.Base(match)
 		baseSize := len(filename) - 4 // Strip .txt from note filenames
-		fmt.Println(filename[:baseSize])
+		matches[i] = filename[:baseSize]
+	}
+
+	return matches
+}
+
+func showAllNotes() {
+	notes := getAllNotes()
+
+	for _, note := range notes {
+		fmt.Println(note)
 	}
 }
 
@@ -172,46 +182,60 @@ func main() {
 	app.Name = "notes"
 	app.Version = "0.6.2"
 	app.Usage = "Store your thoughts on all sorts of subjects"
-	app.Action = func(c *cli.Context) {
+	app.EnableBashCompletion = true
+	app.BashComplete = func(c *cli.Context) {
+		notes := getAllNotes()
+		for _, note := range notes {
+			fmt.Println(note)
+		}
+	}
+	app.Action = func(c *cli.Context) error {
 		note := c.Args().First()
 		if len(c.Args()) == 0 {
+			// We received no arguments, equal to:
 			// $ notes
 			showAllNotes()
 		} else if len(c.Args()) == 1 {
+			// We received 1 argument, to open a specific note, equal to:
 			// $ notes <note>
 			showNote(note)
 		} else {
+			// We received 2 arguments, to open a specific note and search, equal to:
 			// $ notes <note> <query>
 			showNote(note, c.Args()[1])
 		}
+		return nil
 	}
 	app.Commands = []cli.Command{
 		{
 			Name:      "list",
 			ShortName: "l",
 			Usage:     "List all notes",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				// $ notes list
 				showAllNotes()
+				return nil
 			},
 		},
 		{
 			Name:      "new",
 			ShortName: "n",
 			Usage:     "Create new note",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				// $ notes new <note>
 				editOrCreateNote(c.Args().First())
+				return nil
 			},
 		},
 		{
 			Name:      "edit",
 			ShortName: "e",
 			Usage:     "Edit a note",
-			Action: func(c *cli.Context) {
+			Action: func(c *cli.Context) error {
 				// $ notes edit <note>
 				// $ notes e <note>
 				editOrCreateNote(c.Args().First())
+				return nil
 			},
 		},
 	}
