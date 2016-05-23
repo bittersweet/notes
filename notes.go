@@ -29,6 +29,7 @@ func (n *Note) Print() {
 	fmt.Println()
 }
 
+// findNotes looks for <query> in all notes passed in, returns matching notes.
 func findNotes(notes []Note, query string) []Note {
 	var results []Note
 
@@ -55,6 +56,8 @@ Loop:
 	return results
 }
 
+// getAllNotes returns all .txt files in the notes dir, with the extension
+// removed.
 func getAllNotes() []string {
 	path := fmt.Sprintf("%v/*.txt", getNotesDir())
 	matches, err := filepath.Glob(path)
@@ -72,6 +75,7 @@ func getAllNotes() []string {
 	return matches
 }
 
+// showAllNotes prints out all note filenames.
 func showAllNotes() {
 	notes := getAllNotes()
 
@@ -80,15 +84,10 @@ func showAllNotes() {
 	}
 }
 
+// showNote prints out a complete note file with all notes, adding a newline in
+// between and leveraging colorizeComment to pretty print the explanation.
 func showNote(params ...string) {
 	note := params[0]
-	var query string
-	// params will be > 1 if a search term has been entered:
-	// $ notes <note> <query>
-	if len(params) > 1 {
-		query = params[1]
-	}
-
 	path := getNote(note)
 	file, err := os.Open(path)
 	if err != nil {
@@ -117,20 +116,26 @@ func showNote(params ...string) {
 			n.Command = append(n.Command, line)
 		}
 	}
+
 	if len(n.Explanation) > 0 {
 		// Do not append an empty note if a newline was the last line of a file
 		notes = append(notes, n)
 	}
 
+	// If we received multiple parameters, the second one will be the query, we
+	// filter our parsed notes here.
 	if len(params) > 1 {
+		query := params[1]
 		notes = findNotes(notes, query)
 	}
 
-	for i := 0; i < len(notes); i++ {
-		notes[i].Print()
+	for _, note := range notes {
+		note.Print()
 	}
 }
 
+// colorizeComment pretty prints a note, the comment description gets a
+// different color.
 func colorizeComment(line string) {
 	highlight := "\033[33m"
 	reset := "\033[0m"
@@ -138,6 +143,7 @@ func colorizeComment(line string) {
 	fmt.Printf("%v%v%v\n", highlight, line, reset)
 }
 
+// editOrCreateNote opens <note> in your editor.
 func editOrCreateNote(note string) {
 	path := getNote(note)
 
@@ -148,6 +154,8 @@ func editOrCreateNote(note string) {
 	command.Run()
 }
 
+// getEditor checks your environment variables to see which editor you use,
+// falling back to vi.
 func getEditor() string {
 	editor := os.Getenv("EDITOR")
 	if len(editor) == 0 {
