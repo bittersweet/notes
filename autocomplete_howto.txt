@@ -1,2 +1,17 @@
 $ source zsh_autocomplete
 $ notes e <file>
+
+==> Pouring tig-2.1.1.el_capitan.bottle.2.tar.gz
+==> Caveats
+A sample of the default configuration has been installed to:
+  /usr/local/opt/tig/share/tig/examples/tigrc
+to override the system-wide default configuration, copy the sample to:
+  /usr/local/etc/tigrc
+
+Bash completion has been installed to:
+  /usr/local/etc/bash_completion.d
+
+zsh completion has been installed to:
+  /usr/local/share/zsh/site-functions
+==> Summary
+  /usr/local/Cellar/tig/2.1.1: 11 files, 431.4K
