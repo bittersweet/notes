@@ -18,7 +18,7 @@ type Note struct {
 	Command     []string
 }
 
-// Print outputs an indivial note comment and command to STDOUT
+// Print outputs an indivial note explanation and command to STDOUT.
 func (n *Note) Print() {
 	for _, line := range n.Explanation {
 		colorizeComment(line)
@@ -28,6 +28,15 @@ func (n *Note) Print() {
 		fmt.Println(line)
 	}
 	fmt.Println()
+}
+
+// hasData checks if there is an explanation and command set for this note.
+func (n *Note) hasData() bool {
+	if len(n.Explanation) > 0 && len(n.Command) > 0 {
+		return true
+	}
+
+	return false
 }
 
 // findNotes looks for <query> in all notes passed in, returns matching notes.
@@ -132,18 +141,19 @@ func parseNoteFile(note string) ([]Note, error) {
 		commentRegexp, _ := regexp.Compile("^#")
 		if commentRegexp.MatchString(line) == true {
 			n.Explanation = append(n.Explanation, line)
+		} else if len(line) > 0 {
+			n.Command = append(n.Command, line)
 		} else if line == "" {
 			// newline means the start of a new note so we add the last found note
 			// and set n to a new note to restart the process
 			notes = append(notes, n)
 			n = Note{} // Reset note
-		} else {
-			n.Command = append(n.Command, line)
 		}
 	}
 
-	if len(n.Explanation) > 0 {
-		// Do not append an empty note if a newline was the last line of a file
+	// We are done going over all the lines. If the file ended without a blank
+	// line it was not appended to our slice yet in the loop, so do that here.
+	if n.hasData() {
 		notes = append(notes, n)
 	}
 
