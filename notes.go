@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -56,6 +57,30 @@ Loop:
 	return results
 }
 
+// searchAllNotes looks through all note files and prints matching notes.
+func searchAllNotes(query string) {
+	filenames := getAllNotes()
+
+	var matchedNotes []Note
+	for _, filename := range filenames {
+		// parse filename and get a []Note
+		note, err := parseNoteFile(filename)
+		if err != nil {
+			log.Fatal("note did not exist")
+		}
+
+		// check if the notes contain our query
+		matches := findNotes(note, query)
+		for _, match := range matches {
+			matchedNotes = append(matchedNotes, match)
+		}
+	}
+
+	for _, note := range matchedNotes {
+		note.Print()
+	}
+}
+
 // getAllNotes returns all .txt files in the notes dir, with the extension
 // removed.
 func getAllNotes() []string {
@@ -84,16 +109,15 @@ func showAllNotes() {
 	}
 }
 
-// showNote prints out a complete note file with all notes, adding a newline in
-// between and leveraging colorizeComment to pretty print the explanation.
-func showNote(params ...string) {
-	note := params[0]
+// parseNoteFile reads a file from `note` and converts that to a slice of
+// `Note`s. It will return an err if the file can not be opened (for now I'm
+// assuming that always means it does not exist yet).
+func parseNoteFile(note string) ([]Note, error) {
 	path := getNote(note)
 	file, err := os.Open(path)
 	if err != nil {
-		// File does not exist, create it
-		editOrCreateNote(note)
-		return
+		// File does not exist
+		return nil, err
 	}
 	defer file.Close()
 
@@ -104,6 +128,7 @@ func showNote(params ...string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
+		// lines that start with a `#` are the note's comment
 		commentRegexp, _ := regexp.Compile("^#")
 		if commentRegexp.MatchString(line) == true {
 			n.Explanation = append(n.Explanation, line)
@@ -120,6 +145,19 @@ func showNote(params ...string) {
 	if len(n.Explanation) > 0 {
 		// Do not append an empty note if a newline was the last line of a file
 		notes = append(notes, n)
+	}
+
+	return notes, nil
+}
+
+// showNote prints out a complete note file with all notes, adding a newline in
+// between and leveraging colorizeComment to pretty print the explanation.
+func showNote(params ...string) {
+	note := params[0]
+
+	notes, err := parseNoteFile(note)
+	if err != nil {
+		editOrCreateNote(note)
 	}
 
 	// If we received multiple parameters, the second one will be the query, we
@@ -243,6 +281,18 @@ func main() {
 				// $ notes edit <note>
 				// $ notes e <note>
 				editOrCreateNote(c.Args().First())
+				return nil
+			},
+		},
+		{
+			Name:      "search",
+			ShortName: "s",
+			Usage:     "Search through all your notes",
+			Action: func(c *cli.Context) error {
+				// $ notes search <query>
+				// $ notes s <query>
+				query := c.Args().First()
+				searchAllNotes(query)
 				return nil
 			},
 		},
