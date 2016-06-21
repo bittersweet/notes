@@ -42,8 +42,6 @@ func (n *Note) hasData() bool {
 func findNotes(notes []Note, query string) []Note {
 	var results []Note
 
-	fmt.Printf("Searching in %d notes\n", len(notes))
-
 Loop:
 	for _, note := range notes {
 		queryRegexp := fmt.Sprintf("(?i)%s", query)
@@ -148,7 +146,6 @@ func parseNoteFile(note string) ([]Note, error) {
 
 	commentRegexp, _ := regexp.Compile("^#")
 
-	fmt.Println("total lines", len(lines))
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		var previousLine string
