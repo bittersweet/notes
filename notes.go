@@ -146,12 +146,10 @@ func parseNoteFile(note string) ([]Note, error) {
 
 	commentRegexp, _ := regexp.Compile("^#")
 
+	previousLine := ""
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
-		var previousLine string
-		if i == 0 {
-			previousLine = ""
-		} else {
+		if i > 0 {
 			previousLine = lines[i-1]
 		}
 
