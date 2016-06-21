@@ -27,6 +27,9 @@ func (n *Note) Print() {
 	for _, line := range n.Command {
 		fmt.Println(line)
 	}
+
+	// Add empty newline
+	fmt.Println()
 }
 
 // hasData checks if there is an explanation and command set for this note.
@@ -89,9 +92,6 @@ func searchAllNotes(query string) {
 	for _, note := range matchedNotes {
 		note.Print()
 	}
-
-	// Add empty newline
-	fmt.Println()
 }
 
 // getAllNotes returns all .txt files in the notes dir, with the extension
@@ -176,6 +176,21 @@ func parseNoteFile(note string) ([]Note, error) {
 		notes = append(notes, n)
 	}
 
+	// Strip off ending newlines
+	for i, note := range notes {
+		// Start at the end and loop through to the first line
+		for iC := len(note.Command) - 1; iC > 0; iC-- {
+			line := note.Command[iC]
+			if line == "" {
+				note.Command = note.Command[0:iC]
+				notes[i] = note
+			} else {
+				// We found a non-blank string, on to the next note
+				break
+			}
+		}
+	}
+
 	return notes, nil
 }
 
@@ -199,9 +214,6 @@ func showNote(params ...string) {
 	for _, note := range notes {
 		note.Print()
 	}
-
-	// Add empty newline
-	fmt.Println()
 }
 
 // colorizeComment pretty prints a note, the comment description gets a
