@@ -27,7 +27,6 @@ func (n *Note) Print() {
 	for _, line := range n.Command {
 		fmt.Println(line)
 	}
-	fmt.Println()
 }
 
 // hasData checks if there is an explanation and command set for this note.
@@ -43,6 +42,8 @@ func (n *Note) hasData() bool {
 func findNotes(notes []Note, query string) []Note {
 	var results []Note
 
+	fmt.Printf("Searching in %d notes\n", len(notes))
+
 Loop:
 	for _, note := range notes {
 		queryRegexp := fmt.Sprintf("(?i)%s", query)
@@ -51,7 +52,7 @@ Loop:
 		for _, line := range note.Explanation {
 			if searchRegexp.MatchString(line) == true {
 				results = append(results, note)
-				// We already have a match, continue with the next note
+				// We already found a match, continue with the next note
 				continue Loop
 			}
 		}
@@ -59,6 +60,8 @@ Loop:
 		for _, line := range note.Command {
 			if searchRegexp.MatchString(line) == true {
 				results = append(results, note)
+				// We already found a match, continue with the next note
+				continue Loop
 			}
 		}
 	}
@@ -88,6 +91,9 @@ func searchAllNotes(query string) {
 	for _, note := range matchedNotes {
 		note.Print()
 	}
+
+	// Add empty newline
+	fmt.Println()
 }
 
 // getAllNotes returns all .txt files in the notes dir, with the extension
@@ -134,25 +140,43 @@ func parseNoteFile(note string) ([]Note, error) {
 	var n Note
 
 	scanner := bufio.NewScanner(file)
+	var lines []string
 	for scanner.Scan() {
 		line := scanner.Text()
+		lines = append(lines, line)
+	}
 
-		// lines that start with a `#` are the note's comment
-		commentRegexp, _ := regexp.Compile("^#")
+	commentRegexp, _ := regexp.Compile("^#")
+
+	fmt.Println("total lines", len(lines))
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		var previousLine string
+		if i == 0 {
+			previousLine = ""
+		} else {
+			previousLine = lines[i-1]
+		}
+
 		if commentRegexp.MatchString(line) == true {
+			// We found a # with the preceding string being blank, which means the
+			// start of a new note.
+			if previousLine == "" {
+				// Only add it when it contains an explanation and command, so we don't
+				// add a blank note.
+				if n.hasData() {
+					notes = append(notes, n)
+				}
+				n = Note{}
+			}
 			n.Explanation = append(n.Explanation, line)
-		} else if len(line) > 0 {
+		} else {
 			n.Command = append(n.Command, line)
-		} else if line == "" {
-			// newline means the start of a new note so we add the last found note
-			// and set n to a new note to restart the process
-			notes = append(notes, n)
-			n = Note{} // Reset note
 		}
 	}
 
 	// We are done going over all the lines. If the file ended without a blank
-	// line it was not appended to our slice yet in the loop, so do that here.
+	// line it was not appended yet in the loop, so do that here.
 	if n.hasData() {
 		notes = append(notes, n)
 	}
@@ -180,6 +204,9 @@ func showNote(params ...string) {
 	for _, note := range notes {
 		note.Print()
 	}
+
+	// Add empty newline
+	fmt.Println()
 }
 
 // colorizeComment pretty prints a note, the comment description gets a
