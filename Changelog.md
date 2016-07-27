@@ -1,5 +1,12 @@
 # Notes Changelog
 
+## 0.7.0
+
+- Added searching within all notes with `search` or `s`. Use `$ notes search
+xargs` to print notes from all files that match.
+- Refactored note parsing so you can have newlines within 1 note, thanks
+@mongrelion for [the bugreport](https://github.com/bittersweet/notes/issues/4).
+
 ## 0.6.2
 
 - Fixed opening notes that broke in 0.6.1 because of the removal of the trailing slash :-).

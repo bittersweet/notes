@@ -270,7 +270,7 @@ func getNote(path string) string {
 func main() {
 	app := cli.NewApp()
 	app.Name = "notes"
-	app.Version = "0.6.2"
+	app.Version = "0.7.0"
 	app.Usage = "Store your thoughts on all sorts of subjects"
 	app.EnableBashCompletion = true
 	app.BashComplete = func(c *cli.Context) {
