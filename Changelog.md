@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.7.1
+
+- Project now uses Go modules.
+
 ## 0.7.0
 
 - Added searching within all notes with `search` or `s`. Use `$ notes search
