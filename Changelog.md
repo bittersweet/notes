@@ -1,5 +1,9 @@
 # Notes Changelog
 
+## 0.7.2
+
+- Nix compatibility via `make install`.
+
 ## 0.7.1
 
 - Project now uses Go modules.
